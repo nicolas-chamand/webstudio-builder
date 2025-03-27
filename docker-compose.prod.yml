@@ -1,8 +1,6 @@
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/nicolas-chamand/webstudio-builder:0.209.0
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,4 +50,3 @@ services:
       PGRST_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is not set}
       PGRST_DB_USE_LEGACY_GUCS: "false"
       PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is not set}
-      # PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
