@@ -1,0 +1,55 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_NAME: ${DB_NAME:?DB_NAME is not set}
+      DB_USER: ${DB_USER:?DB_USER is not set}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is not set}
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET is not set}
+      POSTGREST_API_KEY: ${POSTGREST_API_KEY:?POSTGREST_API_KEY is not set}
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?pgbouncer=true
+      DIRECT_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "netstat -anp | grep ':5173'"]
+      interval: 10s
+      timeout: 5s
+      retries: 25
+    init: true
+    restart: unless-stopped
+    ports:
+      - ${APP_PORT:-8080}:5173
+
+  postgres:
+    image: postgres:17.4-alpine3.21
+    restart: unless-stopped
+    volumes:
+      - ./docker/postgres/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME:?DB_NAME is not set}
+      POSTGRES_USER: ${DB_USER:?DB_USER is not set}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is not set}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 25
+
+  postgrest:
+    image: postgrest/postgrest:v12.2.0
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      PGRST_DB_URI: postgresql://${DB_USER:?DB_USER is not set}:${DB_PASSWORD:?DB_PASSWORD is not set}@postgres:5432/${DB_NAME:?DB_NAME is not set}
+      PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS:-public}
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is not set}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is not set}
+      # PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
