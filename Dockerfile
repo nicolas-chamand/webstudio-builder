@@ -14,6 +14,6 @@ RUN npm install -g corepack@latest --force \
   && corepack --version \
   && corepack prepare pnpm@9.14.4 --activate
 
-RUN pnpm install && pnpm build
+RUN pnpm install
 
 CMD sh -c "pnpm migrations migrate && pnpm dev"
