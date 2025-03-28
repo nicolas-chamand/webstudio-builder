@@ -4,7 +4,7 @@
 - Docker & Docker Compose
 - HTTPS reverse proxy
 
-This application won't work if not using HTTPS so a reverse proxy doing so is mandatory.
+This application won't work if not using HTTPS so a reverse proxy is mandatory.
 
 ## Installation
 On your server, create a directory to deploy the application and copy both the `docker-compose.yaml` and `env.sh`.
