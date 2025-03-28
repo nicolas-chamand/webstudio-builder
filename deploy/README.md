@@ -40,4 +40,4 @@ Note : This may take a while the first time (two minutes or more) as it needs to
 You can now setup your reverse proxy to start using the application.
 
 ## Usage
-The value of `AUTH_SECRET` in the .env file is the one to be used to log into the app when "Login with Secret".
+The value of `AUTH_SECRET` in the .env file is the one to be used to login into the app when "Login with Secret".
